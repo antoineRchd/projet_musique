@@ -1,0 +1,40 @@
+FROM python:3.11-slim
+
+# Installer les dépendances système
+RUN apt-get update && apt-get install -y \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de requirements
+COPY requirements.txt .
+
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier le code du consumer
+COPY consumer/ ./consumer/
+
+# Créer les répertoires de sortie
+RUN mkdir -p /app/output
+
+# Créer un script d'initialisation pour le consumer
+RUN echo '#!/bin/bash\n\
+    echo "🎧 Attente de Kafka et du Producer..."\n\
+    while ! nc -z kafka 9093; do\n\
+    echo "Kafka pas encore prêt, attente..."\n\
+    sleep 5\n\
+    done\n\
+    echo "✅ Kafka est prêt !"\n\
+    sleep 20\n\
+    echo "🚀 Démarrage du Consumer Kafka..."\n\
+    cd consumer\n\
+    python consumer.py\n\
+    ' > /app/start_consumer.sh
+
+RUN chmod +x /app/start_consumer.sh
+
+CMD ["/app/start_consumer.sh"] 

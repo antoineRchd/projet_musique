@@ -1,0 +1,90 @@
+{
+  "summary": {
+    "total_tracks_processed": 88600,
+    "processing_duration_seconds": 3580.9307663440704,
+    "tracks_per_second": 24.742170618550283,
+    "unique_genres": 89,
+    "unique_artists": 25349,
+    "generated_at": "2025-07-03T12:03:15.983663"
+  },
+  "top_genres": {
+    "acoustic": 1000,
+    "afrobeat": 1000,
+    "alt-rock": 1000,
+    "alternative": 1000,
+    "ambient": 1000,
+    "anime": 1000,
+    "black-metal": 1000,
+    "bluegrass": 1000,
+    "blues": 1000,
+    "brazil": 1000
+  },
+  "top_artists": {
+    "The Beatles": 276,
+    "George Jones": 271,
+    "Linkin Park": 224,
+    "Ella Fitzgerald": 222,
+    "my little airport": 171,
+    "Charlie Brown Jr.": 169,
+    "Stevie Wonder": 159,
+    "Feid": 155,
+    "BTS": 151,
+    "Norah Jones": 150
+  },
+  "audio_features_avg": {
+    "danceability": {
+      "average": 0.5648336083521319,
+      "min": 0.0,
+      "max": 0.984,
+      "count": 88600
+    },
+    "energy": {
+      "average": 0.6574152386027132,
+      "min": 2.02e-05,
+      "max": 1.0,
+      "count": 88600
+    },
+    "valence": {
+      "average": 0.46646787133183154,
+      "min": 0.0,
+      "max": 0.995,
+      "count": 88600
+    },
+    "acousticness": {
+      "average": 0.29005079062618105,
+      "min": 0.0,
+      "max": 0.996,
+      "count": 88600
+    },
+    "instrumentalness": {
+      "average": 0.15980385432358746,
+      "min": 0.0,
+      "max": 0.999,
+      "count": 88600
+    },
+    "liveness": {
+      "average": 0.21044790688487316,
+      "min": 0.00925,
+      "max": 1.0,
+      "count": 88600
+    },
+    "speechiness": {
+      "average": 0.0877776376975138,
+      "min": 0.0,
+      "max": 0.965,
+      "count": 88600
+    },
+    "loudness": {
+      "average": -8.033729085778894,
+      "min": -43.957,
+      "max": 4.532,
+      "count": 88600
+    },
+    "tempo": {
+      "average": 122.98456404063586,
+      "min": 0.0,
+      "max": 243.372,
+      "count": 88600
+    }
+  }
+}

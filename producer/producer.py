@@ -13,11 +13,13 @@ from kafka import KafkaProducer
 from kafka.errors import KafkaError
 import kagglehub
 
-# Configuration
-KAFKA_TOPIC = "spotify-tracks"
-KAFKA_BOOTSTRAP_SERVERS = ["kafka:9092"]
-BATCH_SIZE = 1000
-DELAY_BETWEEN_BATCHES = 1  # seconds
+# Configuration with environment variable support
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "spotify-tracks")
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").split(
+    ","
+)
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1000"))
+DELAY_BETWEEN_BATCHES = int(os.getenv("DELAY_BETWEEN_BATCHES", "1"))  # seconds
 
 # Set up logging
 logging.basicConfig(
@@ -49,7 +51,9 @@ class SpotifyDatasetProducer:
                     linger_ms=10,
                     buffer_memory=33554432,
                 )
-                logger.info("Successfully connected to Kafka")
+                logger.info(
+                    f"Successfully connected to Kafka at {self.bootstrap_servers}"
+                )
                 return True
             except Exception as e:
                 logger.error(f"Attempt {attempt + 1} failed to connect to Kafka: {e}")
@@ -99,6 +103,33 @@ class SpotifyDatasetProducer:
         except Exception as e:
             logger.error(f"Error loading dataset: {e}")
             return None
+
+    def check_if_data_exists(self):
+        """Check if data already exists in Kafka topic"""
+        try:
+            from kafka import KafkaConsumer
+
+            consumer = KafkaConsumer(
+                self.topic,
+                bootstrap_servers=self.bootstrap_servers,
+                consumer_timeout_ms=5000,
+                auto_offset_reset="earliest",
+                group_id="check-data-group",
+            )
+
+            message_count = 0
+            for message in consumer:
+                message_count += 1
+                if message_count >= 10:  # Just check if we have some data
+                    break
+
+            consumer.close()
+            logger.info(f"Found {message_count} existing messages in topic")
+            return message_count > 0
+
+        except Exception as e:
+            logger.warning(f"Could not check existing data: {e}")
+            return False
 
     def publish_to_kafka(self, df):
         """Publish dataset to Kafka topic"""
@@ -163,10 +194,19 @@ class SpotifyDatasetProducer:
     def run(self):
         """Main execution method"""
         logger.info("Starting Spotify Dataset Kafka Producer")
+        logger.info(f"Using Kafka servers: {self.bootstrap_servers}")
+        logger.info(f"Using topic: {self.topic}")
 
         # Connect to Kafka
         if not self.connect_kafka():
             logger.error("Failed to connect to Kafka. Exiting.")
+            return
+
+        # Check if data already exists
+        if self.check_if_data_exists():
+            logger.info(
+                "Data already exists in Kafka topic. Skipping download and upload."
+            )
             return
 
         # Download dataset
